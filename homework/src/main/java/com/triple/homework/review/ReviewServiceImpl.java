@@ -45,18 +45,20 @@ public class ReviewServiceImpl implements ReviewService {
         // 리뷰 저장
         reviewRepository.save(review);
 
-        // 리뷰 마일리지
-        Mileage mileage = new Mileage();
-        mileage.setUserId(review.getUserId());
-        mileage.setReviewId(review.getReviewId());
-        mileage.setMileageLog(MileageLog.REVIEW.name());
-        mileage.setMileageValue(1L);
-        mileage.setCreateBy("Administrator");
-        mileage.setCreateDt(System.currentTimeMillis());
+        // 1자 이상 텍스트 업로드 마일리지
+        if(review.getReviewContent().length() > 0){
+            Mileage mileage = new Mileage();
+            mileage.setUserId(review.getUserId());
+            mileage.setReviewId(review.getReviewId());
+            mileage.setMileageLog(MileageLog.UPLOAD_TEXT.name());
+            mileage.setMileageValue(1L);
+            mileage.setCreateBy("Administrator");
+            mileage.setCreateDt(System.currentTimeMillis());
 
-        mileageRepository.save(mileage);
+            mileageRepository.save(mileage);
+        }
 
-        // 사진 업로드 마일리지
+        // 1장 이상 사진 업로드 마일리지
         if(photos.size() > 0){
             Mileage photosMileage = new Mileage();
             photosMileage.setUserId(review.getUserId());
@@ -92,6 +94,15 @@ public class ReviewServiceImpl implements ReviewService {
         // 수정할 레코드 가져오기
         Review prevReview = reviewRepository.findByReviewIdAndDelYn(review.getReviewId(), 'N');
 
+        // 기존 텍스트 길이
+        int prevTextLength;
+
+        if(prevReview.getReviewContent().equals("")) prevTextLength = 0;
+        else prevTextLength = prevReview.getReviewContent().length();
+
+        // 업데이트될 텍스트 길이
+        int textLength = review.getReviewContent().length();
+
         // 기존 사진 길이
         int prevPhotosLength;
 
@@ -108,7 +119,29 @@ public class ReviewServiceImpl implements ReviewService {
 
         reviewRepository.save(prevReview);
 
-        // Photos 추가 시
+        // Text 관련 수정사항
+        if(prevTextLength < 1 && textLength > 0){
+            // 이전 텍스트 X && 업데이트 텍스트 O => 마일리지 + 1
+            Mileage mileage = new Mileage();
+            mileage.setReviewId(prevReview.getReviewId());
+            mileage.setUserId(prevReview.getUserId());
+            mileage.setMileageLog(MileageLog.UPLOAD_TEXT.name());
+            mileage.setMileageValue(1L);
+            mileage.setCreateBy("Administrator");
+            mileage.setCreateDt(System.currentTimeMillis());
+
+            mileageRepository.save(mileage);
+        }else if(prevTextLength > 0 && textLength < 1){
+            // 이전 텍스트 O && 업데이트 텍스트 X => 마일리지 1점 회수
+            Mileage mileage = mileageRepository.findByReviewIdAndMileageLogAndDelYn(prevReview.getReviewId(), MileageLog.UPLOAD_TEXT.name(), 'N');
+            mileage.setDelYn('Y');
+            mileage.setUpdateBy("Administrator");
+            mileage.setUpdateDt(System.currentTimeMillis());
+
+            mileageRepository.save(mileage);
+        }
+
+        // Photos 관련 수정사항
         if(prevPhotosLength < 1 && photosLength > 0){
             // 이전 리뷰 사진 x && 업데이트 리뷰 사진 O => 마일리지 + 1
             Mileage mileage = new Mileage();
@@ -134,7 +167,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     @Transactional
     public void delete(String reviewId) throws Exception {
-        // 해당 record 미존재시, NOT_FOUND 유도
+        // 해당 record 미존재시, NOT_FOUND
         if(!reviewRepository.existsByReviewIdAndDelYn(reviewId, 'N')) throw new Exception("404");
 
         // 기존 review select
@@ -155,6 +188,8 @@ public class ReviewServiceImpl implements ReviewService {
         // review id로 조회된 마일리지 모두 회수
         for(Mileage mileage : mileages){
             mileage.setDelYn('Y');
+            mileage.setUpdateBy("Administrator");
+            mileage.setUpdateDt(System.currentTimeMillis());
 
             mileageRepository.save(mileage);
         }

@@ -23,14 +23,10 @@ import java.util.*;
 @RestController
 public class ReviewController {
 
-    private final UserService userService;
-    private final PlaceService placeService;
     private final ReviewService reviewService;
 
     @Autowired
-    public ReviewController(UserService userService, PlaceService placeService, ReviewService reviewService) {
-        this.userService = userService;
-        this.placeService = placeService;
+    public ReviewController(ReviewService reviewService) {
         this.reviewService = reviewService;
     }
 
