@@ -40,7 +40,7 @@ public class ReviewServiceImpl implements ReviewService {
         if(reviewRepository.existsByUserIdAndPlaceIdAndDelYn(review.getUserId(), review.getPlaceId(), review.getDelYn()))  throw new Exception("409");
 
         // 특정 장소의 리뷰 개수 조회
-        int reviewCount = reviewRepository.countByPlaceIdAndDelYn(review.getPlaceId(), 'N');
+        boolean isExistsReview = reviewRepository.existsByPlaceIdAndDelYn(review.getPlaceId(), 'N');
 
         // 리뷰 저장
         reviewRepository.save(review);
@@ -72,7 +72,7 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         // 첫 리뷰 보너스 마일리지
-        if(reviewCount == 0){
+        if(!isExistsReview){
             Mileage bonusMileage = new Mileage();
             bonusMileage.setUserId(review.getUserId());
             bonusMileage.setReviewId(review.getReviewId());

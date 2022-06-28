@@ -11,5 +11,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     Review findByReviewIdAndDelYn(String reviewId, Character delYn);
 
-    int countByPlaceIdAndDelYn(String placeId, Character delYn);
+    boolean existsByPlaceIdAndDelYn(String placeId, Character delYn);
 }
