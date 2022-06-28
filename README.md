@@ -15,7 +15,7 @@
 
 ## 개발 환경
 - 기본 환경
-  - IDE : IntelliJ IDEA Community (Settings - Build - Gradle - <Build and run using>, <Run tests using> IntelliJ 설정)
+  - IDE : IntelliJ IDEA Community (Settings - Build - Gradle - Build and run using, Run tests using IntelliJ 설정)
   - OS : Windows 10
   - Git
 - 서버
