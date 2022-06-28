@@ -174,7 +174,7 @@ ENGINE=InnoDB
 - user_id 로 user 의 마일리지 조회를 합니다.
 - mileage_log 로 특정 보상에 대한 회수를 합니다. -> 텍스트 및 사진 업로드, 첫 리뷰 
 
-#### tbl_user (선택)
+#### tbl_user
 
 ```sql
 CREATE TABLE `tbl_user` (
@@ -197,9 +197,9 @@ AUTO_INCREMENT=3
 ```
 
 - user 정보를 저장하는 테이블입니다.
-- 생성하지않아도 무관합니다.
+- 구성만하였을뿐 사용하지는 않습니다.
 
-#### tbl_place (선택)
+#### tbl_place
 
 ```sql
 CREATE TABLE `tbl_place` (
@@ -221,7 +221,7 @@ AUTO_INCREMENT=2
 ```
 
 - place 정보를 저장하는 테이블입니다.
-- 생성하지않아도 무관합니다.
+- 구성만하였을뿐 사용하지는 않습니다.
 
 ### 문제 해결 전략
 #### ADD
